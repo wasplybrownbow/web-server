@@ -16,7 +16,7 @@ var todos   = [
 ];
 
 app.get('/', function(req, res) {
-  res.send('Todo-Api Root');
+  res.send('Todo-Api all the time');
 });
 
 // GET all the todos ------
