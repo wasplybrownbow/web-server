@@ -1,5 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
+var _ = require('underscore');
 
 var app = express();
 var PORT = process.env.PORT || 3000;  // process is a Heroku thing.
@@ -14,6 +15,7 @@ app.get('/', function (req, res) {
 	res.send('Todo API Root');
 });
 
+
 // GET all the todos ------
 // GET /todos
 app.get('/todos', function (req, res) {
@@ -24,17 +26,8 @@ app.get('/todos', function (req, res) {
 // GET individual todo ----
 // GET /todos/:id
 app.get('/todos/:id', function (req, res) {
-	var todoId = parseInt(req.params.id, 10);// request parameters always need to be a string. 
-                                           // So if you know a number is being passed,
-                                           // you have to convert it to a number if you want
-                                           // to use it as a number like we are going to do here.  
-	var matchedTodo;
-
-	todos.forEach(function (todo) {
-		if (todoId === todo.id) {
-			matchedTodo = todo;
-		}
-	});
+	var todoId = parseInt(req.params.id, 10);
+	var matchedTodo = _.findWhere(todos, {id: todoId});
 
 	if (matchedTodo) {
 		res.json(matchedTodo); // Handy shortcut way to send a response with Express
@@ -46,13 +39,20 @@ app.get('/todos/:id', function (req, res) {
 // POST  Post means we can send and the server can take data.
 // POST /todos
 app.post('/todos', function (req, res) {
-	var body = req.body;
-	// add id field
-	body.id = todoNextId++;
-
-	// push body into array
+	var body = _.pick(req.body,'completed','description');
+  
+  // Check for bad or missing data
+  if ( !_.isBoolean(body.completed)  || 
+       !_.isString(body.description) || 
+       body.description.trim().length === 0 )
+     {
+    return res.status(400).send('bad POST body');
+  }
+  
+  body.description = body.description.trim();
+  
+  body.id = todoNextId++;
 	todos.push(body);
-	
 	res.json(body);
 });
 
