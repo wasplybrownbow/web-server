@@ -56,6 +56,18 @@ app.post('/todos', function (req, res) {
 	res.json(body);
 });
 
+// DELETE /todos/:id
+app.delete('/todos/:id', function(req, res){
+  var todoId = parseInt(req.params.id, 10);
+  var matchedTodo = _.findWhere(todos, {id: todoId});
+  if (matchedTodo) {
+    todos = _.without(todos, matchedTodo);
+    return res.status(200).send(matchedTodo);
+  } else {
+    return res.status(400).send('Nothing to delete')
+  }
+})
+
 
 // LET'S LISTEN.....
 app.listen(PORT, function () {
