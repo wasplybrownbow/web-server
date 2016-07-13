@@ -68,6 +68,49 @@ app.delete('/todos/:id', function(req, res){
   }
 })
 
+// PUT /todos/:id
+app.put('/todos/:id', function(req, res){
+  var todoId = parseInt(req.params.id, 10);
+  var matchedTodo = _.findWhere(todos, {id: todoId});
+  var body = _.pick(req.body,'description','completed');
+  var validAtrributes = {};  // stores values we want to use to update our object
+  
+  // First check if the matched todo exists.
+  if (!matchedTodo) {
+    return res.status(404).send('No MatchedTodo-->' + todoId + ' ' + matchedTodo);
+  }
+  
+  // validate!
+  // Introducing .hasOwnProperty returns true if object has the parameter property
+  if (body.hasOwnProperty('completed') && 
+      _.isBoolean(body.completed)) {
+    validAtrributes.completed = body.completed;
+  } else if (body.hasOwnProperty('completed')) { // something wrong in Kansas
+      return res.status(400).send('Bad Boo');
+  } 
+  
+  if (body.hasOwnProperty('description') && 
+      _.isString(body.description)
+      && body.description.trim().length > 0) {
+    validAtrributes.description = body.description;
+  } else if (body.hasOwnProperty('description')) { 
+      return res.status(400).send('Bad Des');
+  } 
+  
+  // If we got this far we are good to update.
+  // Introducing _.Extend --> Copy all of the properties in the source objects over 
+                           // to the destination object, and return the destination object. 
+  // Remember, objects are passed ByRef so this full syntax not needed: matchedTodo = _.extend(matchedTodo, validAtrributes)
+  /* Syntax
+    _.extend({name: 'moe'}, {age: 50});
+    => {name: 'moe', age: 50}
+  */
+  _.extend(matchedTodo, validAtrributes) 
+  res.json(matchedTodo);
+})
+
+
+
 
 // LET'S LISTEN.....
 app.listen(PORT, function () {
