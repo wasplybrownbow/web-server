@@ -18,9 +18,23 @@ app.get('/', function (req, res) {
 
 // GET all the todos ------
 // GET /todos
+// GET /todos/?completed=true
 app.get('/todos', function (req, res) {
-  //instead of using JSON.stringify and .parse, use:
-	res.json(todos); // Pass obj you want converted to jason and sent back to caller.
+  var queryParams = req.query;  // stores the url parameters.
+  var filteredTodos = todos;
+  
+  if(queryParams.hasOwnProperty('completed') && queryParams.completed === 'true'){
+    filteredTodos = _.where(filteredTodos, {completed: true});
+  } else if (queryParams.hasOwnProperty('completed') && queryParams.completed === 'false'){
+    filteredTodos = _.where(filteredTodos, {completed: false});
+  }
+    
+  
+  // use _.where which is same as _.findWhere but returns all matches.
+  //filteredTodos = _.where(filteredTodos, queryParams)
+  
+	//res.json(queryParams)  //(filteredTodos); // Pass obj you want converted to jason and sent back to caller.
+  res.json(filteredTodos);
 });
 
 // GET individual todo ----
