@@ -28,12 +28,13 @@ app.get('/todos', function (req, res) {
   } else if (queryParams.hasOwnProperty('completed') && queryParams.completed === 'false'){
     filteredTodos = _.where(filteredTodos, {completed: false});
   }
-    
-  
-  // use _.where which is same as _.findWhere but returns all matches.
-  //filteredTodos = _.where(filteredTodos, queryParams)
-  
-	//res.json(queryParams)  //(filteredTodos); // Pass obj you want converted to jason and sent back to caller.
+     
+  if (queryParams.hasOwnProperty('q') && queryParams.q.length > 0) {
+    filteredTodos = _.filter(filteredTodos, function(todo) {// Remember, .filter returns values 
+                                                            //that pass the func's condition.
+      return todo.description.indexOf(queryParams.q) > -1;  // Here's the condition.
+    })  
+  }
   res.json(filteredTodos);
 });
 
